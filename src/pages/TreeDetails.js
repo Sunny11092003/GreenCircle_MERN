@@ -1,7 +1,7 @@
 // src/pages/TreeDetails.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ref, get, child } from "firebase/database";
+import { ref, get } from "firebase/database";
 import { db } from "../firebase";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import ImageGallery from "../components/ImageGallery";
@@ -51,7 +51,6 @@ const TreeDetails = () => {
         const snapshot = await get(treesRef);
         if (snapshot.exists()) {
           const allTrees = snapshot.val();
-          // Filter out current tree
           const filteredTrees = Object.values(allTrees).filter(
             (t) => t.treenumber !== id
           );
@@ -61,7 +60,6 @@ const TreeDetails = () => {
         console.error("Error fetching other trees:", err);
       }
     };
-
     fetchOtherTrees();
   }, [id]);
 
@@ -82,7 +80,7 @@ const TreeDetails = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-gray-100 font-sans flex flex-col">
       {/* Hero Section */}
       <div
         className="w-full h-96 relative bg-cover bg-center flex items-center justify-center"
@@ -98,50 +96,14 @@ const TreeDetails = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-32 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-32 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12 flex-grow">
         {/* Main Content */}
         <article className="lg:col-span-2 space-y-12 text-gray-800">
           <Section title="Description">{tree.description}</Section>
           <Section title="Medicinal Benefits">{tree.medicinalBenefits}</Section>
           <Section title="Environmental Benefits">{tree.environmentalBenefits}</Section>
 
-          {/* Image Gallery */}
-          {tree.images?.length > 0 && (
-            <Section title="Gallery">
-              <ImageGallery images={tree.images} />
-            </Section>
-          )}
-
-{/* Explore Other Trees */}
-{otherTrees.length > 0 && (
-  <Section title="Explore Other Trees">
-    <div className="flex space-x-4 overflow-x-auto py-4">
-      {otherTrees.slice(0, 5).map((t) => (
-        <div
-          key={t.treenumber}
-          className="min-w-[200px] bg-white shadow-md rounded-xl overflow-hidden cursor-pointer hover:scale-105 transform transition duration-300 flex-shrink-0"
-          onClick={() => navigate(`/tree/${t.uid}`)}
-        >
-          {t.images && t.images[0] && (
-            <img
-              src={t.images[0].url}
-              alt={t.Name}
-              className="w-full h-48 object-cover"
-            />
-          )}
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t.Name}</h3>
-            <p className="text-gray-600 text-sm">{t.category || "N/A"}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </Section>
-)}
-        </article>
-
-        {/* Sidebar */}
-        <aside className="space-y-8 sticky top-20">
+          {/* Scientific Classification above Gallery */}
           <InfoBox title="Scientific Classification">
             <InfoRow label="Kingdom" value={tree.kingdom || "Plantae"} />
             <InfoRow label="Phylum" value={tree.phylum || "Tracheophyta"} />
@@ -152,6 +114,44 @@ const TreeDetails = () => {
             <InfoRow label="Species" value={tree.species || "A. indica"} />
           </InfoBox>
 
+          {/* Image Gallery */}
+          {tree.images?.length > 0 && (
+            <Section title="Gallery">
+              <ImageGallery images={tree.images} />
+            </Section>
+          )}
+
+          {/* Explore Other Trees */}
+          {otherTrees.length > 0 && (
+            <Section title="Explore Other Trees">
+              <div className="flex space-x-4 overflow-x-auto py-4">
+                {otherTrees.slice(0, 5).map((t) => (
+                  <div
+                    key={t.treenumber}
+                    className="min-w-[200px] bg-white shadow-md rounded-xl overflow-hidden cursor-pointer hover:scale-105 transform transition duration-300 flex-shrink-0"
+                    onClick={() => navigate(`/tree/${t.uid}`)}
+                  >
+                    {t.images && t.images[0] && (
+                      <img
+                        src={t.images[0].url}
+                        alt={t.Name}
+                        className="w-full h-48 object-cover"
+                      />
+                    )}
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-900">{t.Name}</h3>
+                      <p className="text-gray-600 text-sm">{t.botanical || "N/A"}</p>
+                      <p className="text-gray-600 text-sm">{t.category || "N/A"}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )}
+        </article>
+
+        {/* Sidebar */}
+        <aside className="space-y-8 sticky top-20">
           <InfoBox title="Quick Info">
             <InfoRow label="Last Updated" value={tree.lastUpdated} />
             <InfoRow label="Location" value={tree.location?.site || "Unknown"} />
@@ -163,6 +163,14 @@ const TreeDetails = () => {
           </InfoBox>
         </aside>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-6 mt-auto">
+      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-32 text-center space-y-2">
+      <p>© {new Date().getFullYear()} Green Circle. All rights reserved.</p>
+      <p>In association with BMSIT&amp;M</p>
+      </div>
+      </footer>
     </div>
   );
 };

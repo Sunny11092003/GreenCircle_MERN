@@ -18,20 +18,21 @@ const ImageGallery = ({ images }) => {
 
   return (
     <div className="relative">
-      {/* Masonry Grid */}
-      <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+      {/* Fixed-size Masonry Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {images.map((img, idx) => (
           <div
             key={idx}
-            className="break-inside-avoid rounded-xl overflow-hidden relative group cursor-pointer"
+            className="rounded-xl overflow-hidden relative cursor-pointer"
             onClick={() => openLightbox(idx)}
+            style={{ height: "250px" }} // Fixed height
           >
             <img
               src={img.url}
               alt={`Tree ${idx + 1}`}
-              className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition" />
+            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition" />
           </div>
         ))}
       </div>
